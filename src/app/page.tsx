@@ -1,6 +1,34 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 
 export default function Home() {
+  const [query, setQuery] = useState("");
+  const [result, setResult] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSearch = async () => {
+    setLoading(true);
+    setError("");
+    setResult(null);
+    try {
+      const res = await fetch(`/api/products?q=${encodeURIComponent(query)}`);
+      if (!res.ok) {
+        const err = await res.json();
+        setError(err.error || "에러가 발생했습니다.");
+      } else {
+        const data = await res.json();
+        setResult(data);
+      }
+    } catch (e) {
+      setError("네트워크 에러가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
